@@ -30,52 +30,45 @@ USE WideWorldImporters
 Продажи смотреть в таблице Sales.Invoices.
 */
 
--- Вариант 1: подзапрос (query cost 50%)
+-- Вариант 1: подзапрос (query cost 3%) - более предпочтителен
 SELECT
-	DISTINCT PersonID,
+	DISTINCT(PersonID),
 	FullName
-FROM (
-	SELECT 
-		InvoiceID,
-		si.InvoiceDate,
-		ap.PersonID,
-		ap.FullName
-	FROM Sales.Invoices as si
-	JOIN Application.People as ap on ap.PersonID = si.SalespersonPersonID and ap.IsSalesperson = 1
-	WHERE si.InvoiceDate <> '2015-07-04'
-	) as subquery
+FROM Sales.Invoices as i
+JOIN Application.People as p on p.PersonID = i.SalespersonPersonID and p.IsSalesperson = 1
+WHERE PersonID NOT IN (SELECT DISTINCT SalespersonPersonID
+					   FROM Sales.Invoices as si
+					   WHERE si.InvoiceDate = '2015-07-04')
 
--- Вариант 2: CTE (query cost 50%)
+-- Вариант 2: CTE (query cost 97%)
 ;WITH CTE AS (
-	SELECT 
-		InvoiceID,
-		si.InvoiceDate,
-		ap.PersonID,
-		ap.FullName
+	SELECT DISTINCT SalespersonPersonID
 	FROM Sales.Invoices as si
-	JOIN Application.People as ap on ap.PersonID = si.SalespersonPersonID and ap.IsSalesperson = 1
-	WHERE si.InvoiceDate <> '2015-07-04'
-)
+	WHERE si.InvoiceDate = '2015-07-04')
+
 SELECT
-	DISTINCT PersonID,
+	DISTINCT(PersonID),
 	FullName
-FROM CTE
+FROM Sales.Invoices as i
+JOIN Application.People as p on p.PersonID = i.SalespersonPersonID and p.IsSalesperson = 1
+LEFT JOIN CTE as c on p.PersonID = c.SalespersonPersonID
+WHERE c.SalespersonPersonID IS NULL
 
 /*
 2. Выберите товары с минимальной ценой (подзапросом). Сделайте два варианта подзапроса. 
 Вывести: ИД товара, наименование товара, цена.
 */
 
--- Вариант 1: подзапрос (query cost 51%)
+-- Вариант 1: подзапрос (query cost 50%)
 SELECT DISTINCT
 	[StockItemID],
 	[Description],
 	[UnitPrice] as [MinPrice]
 FROM Sales.InvoiceLines
-WHERE [UnitPrice] <= (SELECT MIN([UnitPrice])
+WHERE [UnitPrice] = (SELECT MIN([UnitPrice])
 					  FROM Sales.InvoiceLines)
 
--- Вариант 2: CTE (query cost 49%) - более предпочтителен
+-- Вариант 2: CTE (query cost 50%)
 ;WITH CTE AS (
 	SELECT MIN([UnitPrice]) as [MinPrice]
 	FROM Sales.InvoiceLines
@@ -136,14 +129,12 @@ ORDER BY [MaxTransactionAmount] DESC
 который осуществлял упаковку заказов (PackedByPersonID).
 */
 
-WITH CTE AS (
-	SELECT top 3
-		StockItemID,
-		MAX([UnitPrice]) as [UnitPrice]
+;WITH CTE AS (
+	SELECT distinct top 3 [UnitPrice]
 	FROM [WideWorldImporters].[Sales].[InvoiceLines]
-	GROUP BY StockItemID
 	ORDER BY [UnitPrice] DESC
 )
+
 SELECT
 	sc.DeliveryCityID as [CityID],
 	ac.[CityName],
@@ -270,6 +261,6 @@ ORDER BY st.TotalSumm DESC;
 -- Я выбираю третий вариант не только из-за скорости выполнения, но и из-за удобства чтения и логики запроса.
 -- В CTE я вычисляю суммы счета и выбранных товаров, а в итоговой таблице вывожу результаты.
 
--- В посчете TotalSummByInvoice я исключила условие WHERE Orders.PickingCompletedWhen IS NOT NULL, 
+-- В подсчете TotalSummByInvoice я исключила условие WHERE Orders.PickingCompletedWhen IS NOT NULL, 
 -- так как сумма (PickedQuantity * UnitPrice) по этому условию равна нулю, что противоречит другому условию SUM(Quantity * UnitPrice),
 -- значит при объединении запросов такие строки в любом случае не будут выводиться
