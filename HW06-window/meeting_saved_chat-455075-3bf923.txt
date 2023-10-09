@@ -1,0 +1,72 @@
+18:01:11 From izarubin To Everyone:
+	Всем привет!
+18:01:49 From Mila To Everyone:
+	Добрый вечер!
+18:02:21 From Mila To Everyone:
+	+
+18:03:52 From izarubin To Everyone:
+	+
+18:04:37 From izarubin To Everyone:
+	Having позволяет делать условия на агрегирующие методы
+18:04:47 From Евгений Степанов To Everyone:
+	+
+18:04:55 From izarubin To Everyone:
+	ДП
+18:04:57 From izarubin To Everyone:
+	да
+18:11:10 From Mila To Everyone:
+	bcdefa
+18:11:46 From Екатерина To Everyone:
+	bcdefa
+18:17:30 From Екатерина To Everyone:
+	Еще вы просили напомнить про генерацию таблицы "на лету" в теме оконных функций. ☺️
+18:17:49 From Екатерина To Everyone:
+	ок
+18:19:14 From izarubin To Everyone:
+	первый раз вижу такой синтаксис	обычно Таблица.Поле как Поле а здесь	Поле = Таблица.Поле
+18:31:14 From Евгения To Everyone:
+	-
+18:42:35 From Mila To Everyone:
+	+
+18:42:38 From Екатерина To Everyone:
+	+
+18:42:40 From Евгений Степанов To Everyone:
+	+
+19:00:21 From Екатерина To Everyone:
+	+
+19:01:35 From Екатерина To Everyone:
+	То же самое можно было сделать подзапросом с указанием псевдонимов для полей diff, верно?
+19:15:26 From Екатерина To Everyone:
+	стало понятнее
+19:35:27 From izarubin To Everyone:
+	вроде что то показывали через STE через рекурсивный запрос
+19:37:06 From izarubin To Everyone:
+	добавляем к предыдущей строке 1
+19:38:42 From Mila To Everyone:
+	Вопрос: если мне нужны нарастающие итоги начиная с минимального значения (в примерах везде использовали desc), достаточно  в размерности окна не указывать asc? Он вроде по умолчанию будет работать. Так?
+19:41:53 From Mila To Everyone:
+	Спасибо.
+19:49:47 From Mila To Everyone:
+	да, классно
+19:49:48 From Екатерина To Everyone:
+	+
+19:50:04 From Евгений Степанов To Everyone:
+	Спасибо, было интересно!
+19:51:46 From OTUS Онлайн To Everyone:
+	https://otus.ru/polls/69987/
+19:52:03 From izarubin To Everyone:
+	можно вопрос... как не совсем по теме?
+19:54:27 From OTUS Онлайн To Everyone:
+	https://littlekendra.com/2023/07/26/data-careers-dba-dbre-data-engineer/
+19:56:05 From OTUS Онлайн To Everyone:
+	RBAR
+19:56:13 From Mila To Everyone:
+	нет
+19:56:20 From izarubin To Everyone:
+	нет
+20:00:03 From izarubin To Everyone:
+	Да, спасибо
+20:05:48 From Екатерина To Everyone:
+	Спасибо за интересное занятие! Нужно отключиться. Хороших выходных!
+20:09:08 From izarubin To Everyone:
+	Отличный пример:)
