@@ -140,34 +140,20 @@ WHERE RowNum in (1, 2)
 Для этой задачи НЕ нужно писать аналог без аналитических функций.
 */
 
--- Можно было вывести все строки в одном запросе, но тогда получается много дублей, избавилась от дублей в CTE
-;WITH DistItems AS (
-	SELECT DISTINCT
-		l.StockItemID,
-		l.Description,
-		w.Brand,
-		[TypicalWeightPerUnit],
-		l.UnitPrice + l.TaxRate as Price
-	FROM Sales.Invoices as i
-	JOIN Sales.InvoiceLines as l on l.InvoiceID = i.InvoiceID
-	JOIN Sales.Customers as c on c.CustomerID = i.CustomerID
-	JOIN Warehouse.StockItems as w on w.StockItemID = l.StockItemID
-	WHERE YEAR(i.InvoiceDate) = 2016
-)
-
 SELECT
-	StockItemID,
-	[Description],
+	w.StockItemID,
+	[StockItemName],
 	Brand,
-	Price,
-	ROW_NUMBER() OVER (PARTITION BY SUBSTRING([Description], 1, 1) ORDER BY SUBSTRING([Description], 1, 1)) as RowNumByLetter,
-	(SELECT COUNT(DISTINCT StockItemID) FROM DistItems AS d) as QuantityOfItems, -- оконной функцией уникальные ID посчитать не вышло
-	COUNT(StockItemID) OVER (PARTITION BY SUBSTRING([Description], 1, 1) ORDER BY SUBSTRING([Description], 1, 1)) as QuantityByLetter,
-	LEAD([Description], 1) OVER (ORDER BY [Description]) as NextItemName,
-	LAG(StockItemID, 1) OVER (ORDER BY [Description]) as PrevItemID,
-	COALESCE(LAG([Description], 2) OVER (ORDER BY [Description]), 'No items') as BackTwoRowsItem,
+	UnitPrice + TaxRate as Price,
+	ROW_NUMBER() OVER (PARTITION BY SUBSTRING([StockItemName], 1, 1) ORDER BY SUBSTRING([StockItemName], 1, 1)) as RowNumByLetter,
+	COUNT(w.StockItemID) OVER (PARTITION BY 1) as QuantityOfItems,
+	COUNT(w.StockItemID) OVER (PARTITION BY SUBSTRING([StockItemName], 1, 1) ORDER BY SUBSTRING([StockItemName], 1, 1)) as QuantityByLetter,
+	LEAD([StockItemName], 1) OVER (ORDER BY [StockItemName]) as NextItemName,
+	LAG(w.StockItemID, 1) OVER (ORDER BY [StockItemName]) as PrevItemID,
+	LAG([StockItemName], 2, 'No items') OVER (ORDER BY [StockItemName]) as BackTwoRowsItem,
 	NTILE(30) OVER (ORDER BY [TypicalWeightPerUnit]) WeightGroup
-FROM DistItems as i
+FROM Warehouse.StockItems as w
+
 
 /*
 5. По каждому сотруднику выведите последнего клиента, которому сотрудник что-то продал.
@@ -176,13 +162,13 @@ FROM DistItems as i
 
 SELECT [SalespersonPersonID], FullName, [CustomerID], CustomerName, [InvoiceDate], [SumDoc]
 FROM (
-	SELECT DISTINCT 
+	SELECT
 		[SalespersonPersonID],
 		p.FullName,
 		FIRST_VALUE(i.[CustomerID]) OVER (PARTITION BY [SalespersonPersonID] ORDER BY [InvoiceDate] DESC, i.InvoiceID DESC) as [CustomerID],
 		FIRST_VALUE(c.CustomerName) OVER (PARTITION BY [SalespersonPersonID] ORDER BY [InvoiceDate] DESC, i.InvoiceID DESC) as CustomerName,
 		FIRST_VALUE([InvoiceDate]) OVER (PARTITION BY [SalespersonPersonID] ORDER BY [InvoiceDate] DESC, i.InvoiceID DESC) as [InvoiceDate],
-		SUM(ExtendedPrice) OVER (PARTITION BY [SalespersonPersonID] ORDER BY [InvoiceDate] DESC, i.InvoiceID DESC) as [SumDoc],
+		SUM(ExtendedPrice) OVER (PARTITION BY [SalespersonPersonID], i.InvoiceID) as [SumDoc],
 		ROW_NUMBER() OVER (PARTITION BY [SalespersonPersonID] ORDER BY [InvoiceDate] DESC, i.InvoiceID DESC) as rn
 	FROM [Sales].[Invoices] as i
 	JOIN Sales.InvoiceLines as l on l.InvoiceID = i.InvoiceID
@@ -204,13 +190,12 @@ FROM (
 		l.[StockItemID],
 		l.Description,
 		l.UnitPrice,
-		ROW_NUMBER() OVER (PARTITION BY i.[CustomerID] ORDER BY UnitPrice DESC) as RN,
-		MAX(i.InvoiceDate) AS InvoiceDate
+		DENSE_RANK() OVER (PARTITION BY i.[CustomerID] ORDER BY UnitPrice DESC) as RN,
+		i.InvoiceDate
 	FROM [Sales].[Invoices] as i
 	JOIN Sales.InvoiceLines as l on l.InvoiceID = i.InvoiceID
 	JOIN Sales.Customers as c on c.CustomerID = i.CustomerID
 	JOIN Application.People as p on PersonID = [SalespersonPersonID]
-	GROUP BY i.[CustomerID], c.CustomerName, l.[StockItemID], l.Description, l.UnitPrice
 ) as T
 WHERE rn in (1, 2)
 ORDER BY [CustomerID], UnitPrice DESC
