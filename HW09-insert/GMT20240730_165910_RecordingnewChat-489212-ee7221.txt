@@ -1,0 +1,21 @@
+00:53:23	Вадим:	Добрый вечер
+00:53:35	Konstantin Filipchenko:	Добрый вечер
+00:53:51	Konstantin Filipchenko:	+
+00:53:51	Вадим:	+
+00:54:00	Konstantin Filipchenko:	+
+00:54:00	Вадим:	+
+00:54:01	Alex:	+
+01:08:01	Вадим:	понятно
+01:24:18	Вадим:	нечего
+01:24:38	Alex:	нет новых записей
+01:43:48	Вадим:	первые порвавшиеся 1000
+01:43:59	Вадим:	попавшиеся
+01:44:42	Natalia:	другая сесия
+01:44:48	Natalia:	сессия
+01:54:39	Konstantin Filipchenko:	Вадим! Вам скорее всего пригодится вариант оператора OUTPUT INTO https://learn.microsoft.com/en-us/sql/t-sql/queries/output-clause-transact-sql?view=sql-server-ver16#a-use-output-into-with-an-insert-statement
+01:55:35	Natalia:	там табличеая переменная
+02:11:58	Konstantin Filipchenko:	А может ли сценарий быть пропущен?
+02:32:06	Вадим:	-
+02:32:37	Natalia:	спасибо, до свидания
+02:32:49	Konstantin Filipchenko:	Спасибо!
+02:32:55	Вадим:	До свидания
