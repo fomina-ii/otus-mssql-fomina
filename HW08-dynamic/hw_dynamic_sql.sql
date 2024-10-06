@@ -1,3 +1,5 @@
+/*
+
 Задания выполняются с использованием базы данных WideWorldImporters.
 
 Бэкап БД можно скачать отсюда:
@@ -12,8 +14,6 @@ https://github.com/Microsoft/sql-server-samples/releases/tag/wide-world-importer
 -- ---------------------------------------------------------------------------
 -- Задание - написать выборки для получения указанных ниже данных.
 -- ---------------------------------------------------------------------------
-
-USE WideWorldImporters
 
 /*
 
@@ -36,20 +36,23 @@ InvoiceMonth | Aakriti Byrraju    | Abel Spirlea       | Abel Tatarescu | ... (�
 -------------+--------------------+--------------------+----------------+----------------------
 */
 
+USE WideWorldImporters
 
 DECLARE @dml AS NVARCHAR(MAX)
 DECLARE @ColumnName AS NVARCHAR(MAX)
 
-SELECT @ColumnName = ISNULL(@ColumnName + ',','') + QUOTENAME(CustomerName)
-FROM (SELECT DISTINCT [CustomerName]
-	  FROM [Sales].[Invoices] as i
-	  JOIN Sales.Customers as c on c.CustomerID = i.CustomerID
-	 ) AS names
-
-SELECT @ColumnName as ColumnName 
+-- Формирование списка клиентов с фильтром по ID
+SELECT
+	@ColumnName = ISNULL(@ColumnName + ',', '') + QUOTENAME(CustomerName)
+FROM (
+	SELECT DISTINCT [CustomerName]
+	FROM [Sales].[Invoices] as i
+	JOIN Sales.Customers as c on c.CustomerID = i.CustomerID
+    WHERE c.CustomerID BETWEEN 2 AND 6
+	) AS names
 
 SET @dml = 
-  N'SELECT [Date], ' +@ColumnName + ' FROM
+  N'SELECT [Date], ' + @ColumnName + ' FROM
   (
   SELECT 
 		CA.[Date],
